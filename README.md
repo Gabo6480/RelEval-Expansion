@@ -88,7 +88,8 @@ Using RelEval in conjunction with the [LuckPerms](https://github.com/Placeholder
 
 
 # Download
-You can download this expansion automatically using PAPI download commands:
+This expansion hasn't been uploaded to the eCloud yet.
+<!--You can download this expansion automatically using PAPI download commands:
 
 > ```
 > /papi ecloud download RelEval
@@ -96,3 +97,4 @@ You can download this expansion automatically using PAPI download commands:
 > ```
 
 Or you can download it manually from the [eCloud](https://api.extendedclip.com/expansions/releval/) and then put it in the `expansions` folder (Path: `/plugins/PlaceholderAPI/expansions/`)
+-->
