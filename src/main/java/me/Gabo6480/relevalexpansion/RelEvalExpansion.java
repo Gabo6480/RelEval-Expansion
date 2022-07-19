@@ -60,6 +60,8 @@ public class RelEvalExpansion extends PlaceholderExpansion implements Relational
             switch (yesno){
                 case "yes":
                     result = EvaluateAs(evalAs, player, viewed, args[2]);
+                    if(result != null)
+                        result = result.substring( 0, result.length() - 7);
                     break;
                 case "no":
                     result = args.length > 3 ?
