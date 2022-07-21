@@ -41,6 +41,8 @@ public class RelEvalExpansion extends PlaceholderExpansion implements Relational
         //%rel_releval_<player/viewed>:<bracketed-placeholder-returning-yes/no>_<player/viewed>:<result-yes>%
         //%rel_releval_<player/viewed>:<bracketed-placeholder-returning-yes/no>_<player/viewed>:<result-yes>_<player/viewed>:<result-no>%
 
+        if(player == null || viewed == null)
+            return null;
 
         String[] args = params.split(":");
         //The most basic variant of the placeholder has at least 2 args divided by :
