@@ -1,6 +1,7 @@
 package me.Gabo6480.relevalexpansion;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.Configurable;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
@@ -59,18 +60,16 @@ public class RelEvalExpansion extends PlaceholderExpansion implements Relational
             String yesno = result.substring( 0, result.length() - 7);
             //Isolate the last 6 chars, as they will contain <player/viewed>
             String evalAs = result.substring(result.length() - 6);
-            switch (yesno){
-                case "yes":
-                    result = EvaluateAs(evalAs, player, viewed, args[2]);
-                    if(result != null)
-                        result = result.substring( 0, result.length() - 7);
-                    break;
-                case "no":
+            if(yesno.equals(PlaceholderAPIPlugin.booleanTrue())) {
+                result = EvaluateAs(evalAs, player, viewed, args[2]);
+                if (result != null)
+                    result = result.substring(0, result.length() - 7);
+            }
+            else if(yesno.equals(PlaceholderAPIPlugin.booleanFalse())) {
                     result = args.length > 3 ?
                             EvaluateAs(args[2].substring(args[2].length() - 6), player, viewed, args[3])
                             : null;
-                    break;
-                default:
+            }else{
                     return getIdentifier() + "_invalid_input:" + yesno;
             }
         }
