@@ -9,9 +9,15 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RelEvalExpansion extends PlaceholderExpansion implements Relational {
+
+    static final Pattern placeholderPattern = Pattern.compile("(player|viewed):");
 
     @Override
     public @NotNull String getIdentifier() {
@@ -25,7 +31,7 @@ public class RelEvalExpansion extends PlaceholderExpansion implements Relational
 
     @Override
     public @NotNull String getVersion() {
-        return "1.0";
+        return "1.1";
     }
 
     private String EvaluateAs(String selector, Player player, Player viewed, String params){
@@ -45,30 +51,44 @@ public class RelEvalExpansion extends PlaceholderExpansion implements Relational
         if(player == null || viewed == null)
             return null;
 
-        String[] args = params.split(":");
-        //The most basic variant of the placeholder has at least 2 args divided by :
-        //If there are any less, then something is wrong
-        if(args.length < 2)
+        List<MatchResult> resultList = placeholderPattern.matcher(params).results().toList();
+
+        //The most basic variant of the placeholder will at least match once
+        //If there are none, then something is wrong
+        if(resultList.isEmpty())
             return null;
 
         //args[1] should either be {bracketed-placeholder} or {bracketed-placeholder}_<player/viewed>
         //regardless PlaceholderAPI.setBracketPlaceholders will evaluate them both without problems
-        String result = EvaluateAs(args[0], player, viewed, args[1]);
+        String result = EvaluateAs(
+                resultList.get(0).group(1),
+                player, viewed,
+                params.substring(
+                        resultList.get(0).end(1) + 1,
+                        resultList.size() > 1
+                                ? resultList.get(1).start(1) - 1
+                                : params.length()));
 
-        if(args.length > 2 && result != null){
-            //Remove the last 7 chars as they will contain _<player/viewed>
-            String yesno = result.substring( 0, result.length() - 7);
-            //Isolate the last 6 chars, as they will contain <player/viewed>
-            String evalAs = result.substring(result.length() - 6);
+        if(result != null && resultList.size() > 1){
+            String yesno = result;
             if(yesno.equals(PlaceholderAPIPlugin.booleanTrue())) {
-                result = EvaluateAs(evalAs, player, viewed, args[2]);
-                if (result != null)
-                    result = result.substring(0, result.length() - 7);
+                result = EvaluateAs(
+                        resultList.get(1).group(1),
+                        player, viewed,
+                        params.substring(
+                                resultList.get(1).end(1) + 1,
+                                resultList.size() > 2
+                                        ? resultList.get(2).start(1) - 1
+                                        : params.length()));
             }
             else if(yesno.equals(PlaceholderAPIPlugin.booleanFalse())) {
-                    result = args.length > 3 ?
-                            EvaluateAs(args[2].substring(args[2].length() - 6), player, viewed, args[3])
-                            : null;
+                    result = resultList.size() > 2 ?
+                            EvaluateAs( resultList.get(2).group(1),
+                                    player, viewed,
+                                    params.substring(
+                                            resultList.get(2).end(1) + 1
+                                    ))
+                            : "";
             }else{
                     return getIdentifier() + "_invalid_input:" + yesno;
             }
